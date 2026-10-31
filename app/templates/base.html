@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Brightloop{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -33,8 +34,8 @@
       </nav>
       <div class="user-box">
         <div><strong>{{ user.full_name }}</strong></div>
-        <div class="muted" style="color:#aaa;font-size:0.8rem;">{{ user.role.value }} · {{ user.email }}</div>
-        <a href="/logout" style="color:#fff;margin-top:0.5rem;display:inline-block;font-size:0.85rem;">Sign out</a>
+        <div class="muted" style="color:#94a3b8;font-size:0.8rem;">{{ user.role.value }} · {{ user.email }}</div>
+        <a href="/logout">Sign out</a>
       </div>
     </aside>
     <main class="main">
