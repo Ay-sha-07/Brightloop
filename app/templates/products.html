@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Products · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Products</h1>
+    <p>Catalog with variants and pricing.</p>
+  </div>
+</div>
+
+{% if user.role.value == 'admin' %}
+<div class="panel">
+  <h2>Add product</h2>
+  <form method="post" action="/products" class="form-grid">
+    <div class="field">
+      <label>Name</label>
+      <input type="text" name="name" required>
+    </div>
+    <div class="field">
+      <label>Type</label>
+      <input type="text" name="product_type" value="software">
+    </div>
+    <div class="field">
+      <label>Sales price</label>
+      <input type="number" name="sales_price" step="0.01" min="0" required>
+    </div>
+    <div class="field">
+      <label>Cost price</label>
+      <input type="number" name="cost_price" step="0.01" min="0" value="0">
+    </div>
+    <div class="field" style="grid-column:1/-1;">
+      <label>Notes</label>
+      <input type="text" name="notes">
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Create product</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Sales</th>
+        <th>Cost</th>
+        <th>Variants</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td><strong>{{ p.name }}</strong></td>
+        <td>{{ p.product_type }}</td>
+        <td class="mono">{{ "%.2f"|format(p.sales_price) }}</td>
+        <td class="mono">{{ "%.2f"|format(p.cost_price) }}</td>
+        <td>
+          {% for v in p.variants %}
+            <span class="badge" style="margin-right:0.25rem;">{{ v.name }} +{{ "%.0f"|format(v.price_extra) }}</span>
+          {% else %}
+            —
+          {% endfor %}
+          {% if user.role.value == 'admin' %}
+          <form method="post" action="/products/{{ p.id }}/variants" style="display:inline-flex;gap:0.35rem;margin-top:0.35rem;">
+            <input type="text" name="name" placeholder="Variant" required style="width:100px;padding:0.25rem;">
+            <input type="number" name="price_extra" placeholder="Extra" step="0.01" value="0" style="width:70px;padding:0.25rem;">
+            <button type="submit" class="btn btn-sm">Add</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="empty">No products</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Users · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Users</h1>
+    <p>Only admin can add staff members.</p>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Add staff / admin</h2>
+  <form method="post" action="/users" class="form-grid">
+    <div class="field">
+      <label>Full name</label>
+      <input type="text" name="full_name" required>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" name="email" required>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" name="password" required minlength="9">
+    </div>
+    <div class="field">
+      <label>Role</label>
+      <select name="role">
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Add user</button>
+    </div>
+  </form>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Active</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td><strong>{{ u.full_name }}</strong></td>
+        <td>{{ u.email }}</td>
+        <td><span class="badge">{{ u.role.value }}</span></td>
+        <td>{{ "Yes" if u.is_active else "No" }}</td>
+        <td>{{ u.created_at.strftime("%Y-%m-%d") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

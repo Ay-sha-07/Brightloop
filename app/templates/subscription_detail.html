@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ sub.number }} · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="mono">{{ sub.number }}</h1>
+    <p>{{ sub.customer.full_name }} · {{ sub.plan.name }}</p>
+  </div>
+  <span class="badge badge-{{ sub.status.value }}" style="font-size:0.9rem;padding:0.4rem 0.8rem;">{{ sub.status.value }}</span>
+</div>
+
+<div class="panel">
+  <div class="form-grid">
+    <div>
+      <div class="label muted" style="font-size:0.75rem;text-transform:uppercase;">Start</div>
+      <div>{{ sub.start_date or "—" }}</div>
+    </div>
+    <div>
+      <div class="label muted" style="font-size:0.75rem;text-transform:uppercase;">Expiry</div>
+      <div>{{ sub.expiry_date or "—" }}</div>
+    </div>
+    <div>
+      <div class="label muted" style="font-size:0.75rem;text-transform:uppercase;">Payment terms</div>
+      <div>{{ sub.payment_terms }}</div>
+    </div>
+    <div>
+      <div class="label muted" style="font-size:0.75rem;text-transform:uppercase;">Created</div>
+      <div>{{ sub.created_at.strftime("%Y-%m-%d") }}</div>
+    </div>
+  </div>
+  {% if sub.notes %}
+  <p class="mt-2 muted">{{ sub.notes }}</p>
+  {% endif %}
+</div>
+
+<h2>Lines</h2>
+<div class="table-wrap mb-2">
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Unit</th>
+        <th>Tax %</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in sub.lines %}
+      <tr>
+        <td>{{ line.product.name }}</td>
+        <td>{{ line.quantity }}</td>
+        <td class="mono">{{ "%.2f"|format(line.unit_price) }}</td>
+        <td>{{ line.tax_rate }}</td>
+        <td class="mono">{{ "%.2f"|format(line.amount) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if user.role.value in ['admin', 'staff'] %}
+<div class="panel">
+  <h2>Actions</h2>
+  <div class="btn-group">
+    {% if sub.status.value == 'quotation' %}
+    <form method="post" action="/subscriptions/{{ sub.id }}/status" style="display:inline;">
+      <input type="hidden" name="new_status" value="confirmed">
+      <button type="submit" class="btn btn-primary">Confirm</button>
+    </form>
+    {% endif %}
+    {% if sub.status.value in ['confirmed', 'active'] %}
+    <form method="post" action="/subscriptions/{{ sub.id }}/generate-invoice" style="display:inline;">
+      <button type="submit" class="btn btn-primary">Generate invoice</button>
+    </form>
+    {% endif %}
+    {% if sub.status.value == 'active' and sub.plan.allow_pause %}
+    <form method="post" action="/subscriptions/{{ sub.id }}/status" style="display:inline;">
+      <input type="hidden" name="new_status" value="paused">
+      <button type="submit" class="btn">Pause</button>
+    </form>
+    {% endif %}
+    {% if sub.status.value == 'paused' %}
+    <form method="post" action="/subscriptions/{{ sub.id }}/status" style="display:inline;">
+      <input type="hidden" name="new_status" value="active">
+      <button type="submit" class="btn btn-primary">Resume</button>
+    </form>
+    {% endif %}
+    {% if sub.status.value not in ['closed'] and sub.plan.allow_early_close %}
+    <form method="post" action="/subscriptions/{{ sub.id }}/status" style="display:inline;">
+      <input type="hidden" name="new_status" value="closed">
+      <button type="submit" class="btn">Close</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% if sub.invoices %}
+<h2>Invoices</h2>
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Number</th><th>Status</th><th>Total</th><th>Due</th></tr>
+    </thead>
+    <tbody>
+      {% for inv in sub.invoices %}
+      <tr>
+        <td><a href="/invoices/{{ inv.id }}" class="mono">{{ inv.number }}</a></td>
+        <td><span class="badge badge-{{ inv.status.value }}">{{ inv.status.value }}</span></td>
+        <td class="mono">{{ "%.2f"|format(inv.total) }}</td>
+        <td>{{ inv.due_date or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

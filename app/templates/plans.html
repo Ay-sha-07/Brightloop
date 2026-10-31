@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Plans · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Plans</h1>
+    <p>Billing frequency, rules and availability.</p>
+  </div>
+</div>
+
+{% if user.role.value == 'admin' %}
+<div class="panel">
+  <h2>New plan</h2>
+  <form method="post" action="/plans" class="form-grid">
+    <div class="field">
+      <label>Name</label>
+      <input type="text" name="name" required>
+    </div>
+    <div class="field">
+      <label>Billing frequency</label>
+      <select name="billing_frequency" required>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+        <option value="weekly">Weekly</option>
+        <option value="daily">Daily</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Price</label>
+      <input type="number" name="price" step="0.01" min="0" required>
+    </div>
+    <div class="field">
+      <label>Min quantity</label>
+      <input type="number" name="min_quantity" value="1" min="1">
+    </div>
+    <div class="field">
+      <label><input type="checkbox" name="auto_close" value="true"> Auto-close on end</label>
+    </div>
+    <div class="field">
+      <label><input type="checkbox" name="allow_early_close" value="true" checked> Allow early close</label>
+    </div>
+    <div class="field">
+      <label><input type="checkbox" name="allow_pause" value="true" checked> Allow pause</label>
+    </div>
+    <div class="field">
+      <label><input type="checkbox" name="allow_renew" value="true" checked> Allow renew</label>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Create plan</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Frequency</th>
+        <th>Price</th>
+        <th>Min qty</th>
+        <th>Rules</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for plan in plans %}
+      <tr>
+        <td><strong>{{ plan.name }}</strong></td>
+        <td>{{ plan.billing_frequency.value }}</td>
+        <td class="mono">{{ "%.2f"|format(plan.price) }}</td>
+        <td>{{ plan.min_quantity }}</td>
+        <td style="font-size:0.85rem;">
+          {% if plan.auto_close %}auto-close{% endif %}
+          {% if plan.allow_early_close %} · early close{% endif %}
+          {% if plan.allow_pause %} · pause{% endif %}
+          {% if plan.allow_renew %} · renew{% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="empty">No plans</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

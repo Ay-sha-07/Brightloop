@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Brightloop{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  {% if user %}
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">BRIGHTLOOP</div>
+      <nav>
+        <a href="/dashboard" class="{% if request.url.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+        {% if user.role.value in ['admin', 'staff'] %}
+        <a href="/products" class="{% if '/products' in request.url.path %}active{% endif %}">Products</a>
+        <a href="/plans" class="{% if '/plans' in request.url.path %}active{% endif %}">Plans</a>
+        {% endif %}
+        <a href="/subscriptions" class="{% if '/subscriptions' in request.url.path %}active{% endif %}">Subscriptions</a>
+        <a href="/invoices" class="{% if '/invoices' in request.url.path %}active{% endif %}">Invoices</a>
+        {% if user.role.value == 'admin' %}
+        <a href="/discounts" class="{% if '/discounts' in request.url.path %}active{% endif %}">Discounts</a>
+        <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">Users</a>
+        {% endif %}
+      </nav>
+      <div class="user-box">
+        <div><strong>{{ user.full_name }}</strong></div>
+        <div class="muted" style="color:#aaa;font-size:0.8rem;">{{ user.role.value }} · {{ user.email }}</div>
+        <a href="/logout" style="color:#fff;margin-top:0.5rem;display:inline-block;font-size:0.85rem;">Sign out</a>
+      </div>
+    </aside>
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% else %}
+    {% block auth %}{% endblock %}
+  {% endif %}
+</body>
+</html>

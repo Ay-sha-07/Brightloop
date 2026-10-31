@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Invoices · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Invoices</h1>
+    <p>Generated from subscriptions. Track paid and outstanding.</p>
+  </div>
+  <div class="btn-group">
+    <a href="/invoices" class="btn btn-sm {% if not status_filter %}btn-dark{% endif %}">All</a>
+    <a href="/invoices?status_filter=confirmed" class="btn btn-sm">Outstanding</a>
+    <a href="/invoices?status_filter=paid" class="btn btn-sm">Paid</a>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Customer</th>
+        <th>Status</th>
+        <th>Issue</th>
+        <th>Due</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inv in invoices %}
+      <tr>
+        <td><a href="/invoices/{{ inv.id }}" class="mono">{{ inv.number }}</a></td>
+        <td>{{ inv.customer.full_name }}</td>
+        <td><span class="badge badge-{{ inv.status.value }}">{{ inv.status.value }}</span></td>
+        <td>{{ inv.issue_date }}</td>
+        <td>{{ inv.due_date or "—" }}</td>
+        <td class="mono">{{ "%.2f"|format(inv.total) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">No invoices</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Subscriptions · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Subscriptions</h1>
+    <p>From quote to active recurring revenue.</p>
+  </div>
+  <div class="btn-group">
+    <a href="/subscriptions" class="btn btn-sm {% if not status_filter %}btn-dark{% endif %}">All</a>
+    <a href="/subscriptions?status_filter=active" class="btn btn-sm">Active</a>
+    <a href="/subscriptions?status_filter=quotation" class="btn btn-sm">Quotation</a>
+    <a href="/subscriptions?status_filter=closed" class="btn btn-sm">Closed</a>
+  </div>
+</div>
+
+{% if user.role.value in ['admin', 'staff'] %}
+<div class="panel">
+  <h2>Create subscription</h2>
+  <form method="post" action="/subscriptions" class="form-grid">
+    <div class="field">
+      <label>Customer</label>
+      <select name="customer_id" required>
+        {% for c in customers %}
+        <option value="{{ c.id }}">{{ c.full_name }} ({{ c.email }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Plan</label>
+      <select name="plan_id" required>
+        {% for p in plans %}
+        <option value="{{ p.id }}">{{ p.name }} — {{ p.billing_frequency.value }} {{ "%.2f"|format(p.price) }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Payment terms</label>
+      <input type="text" name="payment_terms" value="Net 30">
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <input type="text" name="notes">
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Create quotation</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Customer</th>
+        <th>Plan</th>
+        <th>Status</th>
+        <th>Start</th>
+        <th>Expiry</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in subs %}
+      <tr>
+        <td><a href="/subscriptions/{{ s.id }}" class="mono">{{ s.number }}</a></td>
+        <td>{{ s.customer.full_name }}</td>
+        <td>{{ s.plan.name }}</td>
+        <td><span class="badge badge-{{ s.status.value }}">{{ s.status.value }}</span></td>
+        <td>{{ s.start_date or "—" }}</td>
+        <td>{{ s.expiry_date or "—" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">No subscriptions</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

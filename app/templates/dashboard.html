@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p>Live view of subscriptions, revenue and outstanding invoices.</p>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="label">Active subscriptions</div>
+    <div class="value">{{ stats.active_subscriptions }}</div>
+  </div>
+  <div class="stat-card accent">
+    <div class="label">Total revenue</div>
+    <div class="value">{{ "%.2f"|format(stats.total_revenue) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Outstanding</div>
+    <div class="value">{{ "%.2f"|format(stats.outstanding) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Overdue invoices</div>
+    <div class="value">{{ stats.overdue_count }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Payments this month</div>
+    <div class="value">{{ "%.2f"|format(stats.payments_this_month) }}</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+  <div>
+    <h2>Recent subscriptions</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Status</th>
+            <th>Start</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in recent_subs %}
+          <tr>
+            <td><a href="/subscriptions/{{ s.id }}" class="mono">{{ s.number }}</a></td>
+            <td><span class="badge badge-{{ s.status.value }}">{{ s.status.value }}</span></td>
+            <td>{{ s.start_date or "—" }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="empty">No subscriptions yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <h2>Recent invoices</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Status</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in recent_invoices %}
+          <tr>
+            <td><a href="/invoices/{{ inv.id }}" class="mono">{{ inv.number }}</a></td>
+            <td><span class="badge badge-{{ inv.status.value }}">{{ inv.status.value }}</span></td>
+            <td class="mono">{{ "%.2f"|format(inv.total) }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="empty">No invoices yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

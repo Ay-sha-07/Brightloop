@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Brightloop{% endblock %}
+{% block auth %}
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Brightloop</h1>
+    <p class="sub">Subscription management for the long haul.</p>
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="/login">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@company.com">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem;">Sign in</button>
+    </form>
+    <div class="auth-footer">
+      New customer? <a href="/signup">Create an account</a>
+    </div>
+    <div class="mt-2" style="font-size:0.8rem;color:#666;border-top:1px solid #ddd;padding-top:0.75rem;">
+      Demo: admin@brightloop.io / Admin@1234<br>
+      staff@brightloop.io / Staff@1234<br>
+      customer@example.com / Customer@1
+    </div>
+  </div>
+</div>
+{% endblock %}

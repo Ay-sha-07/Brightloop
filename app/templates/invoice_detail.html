@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ inv.number }} · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="mono">{{ inv.number }}</h1>
+    <p>{{ inv.customer.full_name }} · Subscription <a href="/subscriptions/{{ inv.subscription_id }}">#{{ inv.subscription_id }}</a></p>
+  </div>
+  <span class="badge badge-{{ inv.status.value }}" style="font-size:0.9rem;padding:0.4rem 0.8rem;">{{ inv.status.value }}</span>
+</div>
+
+<div class="panel">
+  <div class="form-grid">
+    <div>
+      <div class="muted" style="font-size:0.75rem;text-transform:uppercase;">Issue date</div>
+      <div>{{ inv.issue_date }}</div>
+    </div>
+    <div>
+      <div class="muted" style="font-size:0.75rem;text-transform:uppercase;">Due date</div>
+      <div>{{ inv.due_date or "—" }}</div>
+    </div>
+    <div>
+      <div class="muted" style="font-size:0.75rem;text-transform:uppercase;">Subtotal</div>
+      <div class="mono">{{ "%.2f"|format(inv.subtotal) }}</div>
+    </div>
+    <div>
+      <div class="muted" style="font-size:0.75rem;text-transform:uppercase;">Tax</div>
+      <div class="mono">{{ "%.2f"|format(inv.tax_amount) }}</div>
+    </div>
+    <div>
+      <div class="muted" style="font-size:0.75rem;text-transform:uppercase;">Discount</div>
+      <div class="mono">{{ "%.2f"|format(inv.discount_amount) }}</div>
+    </div>
+    <div>
+      <div class="muted" style="font-size:0.75rem;text-transform:uppercase;">Total</div>
+      <div class="mono" style="font-size:1.25rem;font-weight:700;">{{ "%.2f"|format(inv.total) }}</div>
+    </div>
+  </div>
+</div>
+
+<h2>Lines</h2>
+<div class="table-wrap mb-2">
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Unit</th>
+        <th>Tax %</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in inv.lines %}
+      <tr>
+        <td>{{ line.description }}</td>
+        <td>{{ line.quantity }}</td>
+        <td class="mono">{{ "%.2f"|format(line.unit_price) }}</td>
+        <td>{{ line.tax_rate }}</td>
+        <td class="mono">{{ "%.2f"|format(line.amount) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if inv.payments %}
+<h2>Payments</h2>
+<div class="table-wrap mb-2">
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Method</th><th>Amount</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+      {% for p in inv.payments %}
+      <tr>
+        <td>{{ p.payment_date }}</td>
+        <td>{{ p.method }}</td>
+        <td class="mono">{{ "%.2f"|format(p.amount) }}</td>
+        <td>{{ p.note or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if user.role.value in ['admin', 'staff'] and inv.status.value != 'paid' and inv.status.value != 'cancelled' %}
+<div class="panel">
+  <h2>Record payment</h2>
+  <form method="post" action="/invoices/{{ inv.id }}/pay" class="form-grid">
+    <div class="field">
+      <label>Amount</label>
+      <input type="number" name="amount" step="0.01" min="0.01" value="{{ inv.total }}" required>
+    </div>
+    <div class="field">
+      <label>Method</label>
+      <select name="method" required>
+        <option value="bank_transfer">Bank transfer</option>
+        <option value="card">Card</option>
+        <option value="cash">Cash</option>
+        <option value="cheque">Cheque</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Note</label>
+      <input type="text" name="note">
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Record payment</button>
+    </div>
+  </form>
+  <div class="mt-2 btn-group">
+    {% if inv.status.value == 'draft' %}
+    <form method="post" action="/invoices/{{ inv.id }}/status" style="display:inline;">
+      <input type="hidden" name="new_status" value="confirmed">
+      <button type="submit" class="btn">Confirm invoice</button>
+    </form>
+    {% endif %}
+    <form method="post" action="/invoices/{{ inv.id }}/status" style="display:inline;">
+      <input type="hidden" name="new_status" value="cancelled">
+      <button type="submit" class="btn">Cancel</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Create account · Brightloop{% endblock %}
+{% block auth %}
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Create account</h1>
+    <p class="sub">One email, one account. Password rules apply.</p>
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="/signup">
+      <div class="field">
+        <label for="full_name">Full name</label>
+        <input type="text" id="full_name" name="full_name" required>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required minlength="9"
+               pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?&quot;:{}|<>_\-+=\[\]\\;/]).{9,}"
+               title="More than 8 chars, uppercase, lowercase, special character">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem;">Create account</button>
+    </form>
+    <div class="auth-footer">
+      Already have an account? <a href="/login">Sign in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
