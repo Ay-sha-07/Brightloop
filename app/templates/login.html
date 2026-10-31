@@ -4,7 +4,7 @@
 <div class="auth-page">
   <div class="auth-card">
     <h1>Brightloop</h1>
-    <p class="sub">Subscription management for the long haul.</p>
+    <p class="sub">Subscription management built for recurring revenue.</p>
     {% if error %}
     <div class="error-box">{{ error }}</div>
     {% endif %}
@@ -15,16 +15,17 @@
       </div>
       <div class="field">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password">
+        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
       </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem;">Sign in</button>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.65rem;">Sign in</button>
     </form>
     <div class="auth-footer">
       <a href="/forgot-password">Forgot password?</a><br>
       New customer? <a href="/signup">Create an account</a>
     </div>
-    <div class="mt-2" style="font-size:0.8rem;color:#666;border-top:1px solid #ddd;padding-top:0.75rem;">
-      Demo: admin@brightloop.io / Admin@1234<br>
+    <div class="mt-2" style="font-size:0.78rem;color:#64748b;border-top:1px solid rgba(255,255,255,0.08);padding-top:0.85rem;line-height:1.6;">
+      Demo accounts<br>
+      admin@brightloop.io / Admin@1234<br>
       staff@brightloop.io / Staff@1234<br>
       customer@example.com / Customer@1
     </div>
