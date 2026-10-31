@@ -10,26 +10,67 @@
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+  <!-- Animatic Living Background Layers -->
+  <div class="anim-bg-grid" aria-hidden="true"></div>
+  <div class="anim-bg-spotlight" id="spotlight" aria-hidden="true"></div>
+  <div class="floating-symbols" aria-hidden="true">
+    <div class="float-item">✦</div>
+    <div class="float-item">■</div>
+    <div class="float-item">▲</div>
+    <div class="float-item">✕</div>
+    <div class="float-item">✦</div>
+  </div>
+
   {% if user %}
   <div class="shell">
     <aside class="sidebar">
       <div class="brand">BRIGHTLOOP</div>
       <nav>
-        <a href="/dashboard" class="{% if request.url.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="/dashboard" class="{% if request.url.path == '/dashboard' %}active{% endif %}">
+          <span>Dashboard</span>
+          {% if request.url.path == '/dashboard' %}<span class="nav-pulse"></span>{% endif %}
+        </a>
         {% if user.role.value in ['admin', 'staff'] %}
-        <a href="/products" class="{% if '/products' in request.url.path %}active{% endif %}">Products</a>
-        <a href="/plans" class="{% if '/plans' in request.url.path %}active{% endif %}">Plans</a>
+        <a href="/products" class="{% if '/products' in request.url.path %}active{% endif %}">
+          <span>Products</span>
+          {% if '/products' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
+        <a href="/plans" class="{% if '/plans' in request.url.path %}active{% endif %}">
+          <span>Plans</span>
+          {% if '/plans' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
         {% endif %}
-        <a href="/subscriptions" class="{% if '/subscriptions' in request.url.path %}active{% endif %}">Subscriptions</a>
-        <a href="/invoices" class="{% if '/invoices' in request.url.path %}active{% endif %}">Invoices</a>
+        <a href="/subscriptions" class="{% if '/subscriptions' in request.url.path %}active{% endif %}">
+          <span>Subscriptions</span>
+          {% if '/subscriptions' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
+        <a href="/invoices" class="{% if '/invoices' in request.url.path %}active{% endif %}">
+          <span>Invoices</span>
+          {% if '/invoices' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
         {% if user.role.value in ['admin', 'staff'] %}
-        <a href="/billing" class="{% if '/billing' in request.url.path %}active{% endif %}">Billing run</a>
-        <a href="/quotation-templates" class="{% if '/quotation' in request.url.path %}active{% endif %}">Quote templates</a>
+        <a href="/billing" class="{% if '/billing' in request.url.path %}active{% endif %}">
+          <span>Billing run</span>
+          {% if '/billing' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
+        <a href="/quotation-templates" class="{% if '/quotation' in request.url.path %}active{% endif %}">
+          <span>Quote templates</span>
+          {% if '/quotation' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
         {% endif %}
         {% if user.role.value == 'admin' %}
-        <a href="/discounts" class="{% if '/discounts' in request.url.path %}active{% endif %}">Discounts</a>
-        <a href="/tax-rules" class="{% if '/tax' in request.url.path %}active{% endif %}">Tax rules</a>
-        <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">Users</a>
+        <a href="/discounts" class="{% if '/discounts' in request.url.path %}active{% endif %}">
+          <span>Discounts</span>
+          {% if '/discounts' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
+        <a href="/tax-rules" class="{% if '/tax' in request.url.path %}active{% endif %}">
+          <span>Tax rules</span>
+          {% if '/tax' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
+        <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">
+          <span>Users</span>
+          {% if '/users' in request.url.path %}<span class="nav-pulse"></span>{% endif %}
+        </a>
         {% endif %}
       </nav>
       <div class="user-box">
@@ -45,5 +86,38 @@
   {% else %}
     {% block auth %}{% endblock %}
   {% endif %}
+
+  <!-- Reactive Mouse Spotlight Tracker -->
+  <script>
+    (function() {
+      let targetX = window.innerWidth / 2;
+      let targetY = window.innerHeight / 2;
+      let currentX = targetX;
+      let currentY = targetY;
+      let ticking = false;
+
+      window.addEventListener('mousemove', function(e) {
+        targetX = e.clientX;
+        targetY = e.clientY;
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(updateCursor);
+        }
+      }, { passive: true });
+
+      function updateCursor() {
+        currentX += (targetX - currentX) * 0.15;
+        currentY += (targetY - currentY) * 0.15;
+        document.documentElement.style.setProperty('--cursor-x', currentX.toFixed(1) + 'px');
+        document.documentElement.style.setProperty('--cursor-y', currentY.toFixed(1) + 'px');
+
+        if (Math.abs(targetX - currentX) > 0.5 || Math.abs(targetY - currentY) > 0.5) {
+          requestAnimationFrame(updateCursor);
+        } else {
+          ticking = false;
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
