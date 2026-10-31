@@ -143,6 +143,7 @@ class Subscription(Base):
     expiry_date = Column(Date, nullable=True)
     payment_terms = Column(String(100), default="Net 30")
     notes = Column(Text, default="")
+    next_billing_date = Column(Date, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -251,3 +252,16 @@ class Payment(Base):
 
     invoice = relationship("Invoice", back_populates="payments")
     recorded_by = relationship("User", back_populates="payments")
+
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    token = Column(String(64), unique=True, nullable=False, index=True)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")

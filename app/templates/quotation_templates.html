@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Quotation templates · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Quotation templates</h1>
+    <p>Reusable offers with a plan and validity window.</p>
+  </div>
+</div>
+<div class="panel">
+  <h2>New template</h2>
+  <form method="post" action="/quotation-templates" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field"><label>Name</label><input type="text" name="name" required></div>
+    <div class="field">
+      <label>Plan</label>
+      <select name="plan_id" required>
+        {% for p in plans %}
+        <option value="{{ p.id }}">{{ p.name }} — {{ p.billing_frequency.value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Validity (days)</label><input type="number" name="validity_days" value="30" min="1"></div>
+    <div class="field"><label>Notes</label><input type="text" name="notes"></div>
+    <div><button type="submit" class="btn btn-primary">Create template</button></div>
+  </form>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>Plan</th><th>Validity</th><th>Active</th></tr></thead>
+    <tbody>
+      {% for t in templates_list %}
+      <tr>
+        <td><strong>{{ t.name }}</strong></td>
+        <td>{{ t.plan.name }}</td>
+        <td>{{ t.validity_days }} days</td>
+        <td>{{ "Yes" if t.is_active else "No" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">No templates</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

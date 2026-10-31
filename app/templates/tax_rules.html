@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Tax rules · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Tax rules</h1>
+    <p>Default rate is applied automatically on invoices.</p>
+  </div>
+</div>
+<div class="panel">
+  <h2>Add tax rule</h2>
+  <form method="post" action="/tax-rules" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field"><label>Name</label><input type="text" name="name" required></div>
+    <div class="field"><label>Rate %</label><input type="number" name="rate" step="0.01" min="0" max="100" required></div>
+    <div class="field"><label><input type="checkbox" name="is_default" value="true"> Default</label></div>
+    <div><button type="submit" class="btn btn-primary">Create</button></div>
+  </form>
+</div>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>Rate</th><th>Default</th><th>Active</th></tr></thead>
+    <tbody>
+      {% for t in rules %}
+      <tr>
+        <td><strong>{{ t.name }}</strong></td>
+        <td class="mono">{{ "%.2f"|format(t.rate) }}%</td>
+        <td>{{ "Yes" if t.is_default else "No" }}</td>
+        <td>{{ "Yes" if t.is_active else "No" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">No tax rules</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

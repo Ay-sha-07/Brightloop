@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Billing run · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Billing day</h1>
+    <p>Generate invoices for every active subscription due today or earlier.</p>
+  </div>
+</div>
+<div class="panel">
+  <p><strong>{{ due|length }}</strong> subscription(s) due for billing.</p>
+  <form method="post" action="/billing/run">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="btn btn-primary" {% if not due %}disabled{% endif %}>Run billing</button>
+  </form>
+</div>
+{% if results %}
+<div class="panel">
+  <h2>Last run</h2>
+  <ul>
+    {% for r in results %}
+    <li class="mono">{{ r }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Number</th><th>Customer</th><th>Plan</th><th>Next billing</th></tr></thead>
+    <tbody>
+      {% for s in due %}
+      <tr>
+        <td class="mono"><a href="/subscriptions/{{ s.id }}">{{ s.number }}</a></td>
+        <td>{{ s.customer.full_name }}</td>
+        <td>{{ s.plan.name }}</td>
+        <td>{{ s.next_billing_date }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">Nothing due</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

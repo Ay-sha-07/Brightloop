@@ -21,8 +21,13 @@
         {% endif %}
         <a href="/subscriptions" class="{% if '/subscriptions' in request.url.path %}active{% endif %}">Subscriptions</a>
         <a href="/invoices" class="{% if '/invoices' in request.url.path %}active{% endif %}">Invoices</a>
+        {% if user.role.value in ['admin', 'staff'] %}
+        <a href="/billing" class="{% if '/billing' in request.url.path %}active{% endif %}">Billing run</a>
+        <a href="/quotation-templates" class="{% if '/quotation' in request.url.path %}active{% endif %}">Quote templates</a>
+        {% endif %}
         {% if user.role.value == 'admin' %}
         <a href="/discounts" class="{% if '/discounts' in request.url.path %}active{% endif %}">Discounts</a>
+        <a href="/tax-rules" class="{% if '/tax' in request.url.path %}active{% endif %}">Tax rules</a>
         <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">Users</a>
         {% endif %}
       </nav>

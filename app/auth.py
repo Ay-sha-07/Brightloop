@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from .database import get_db
 from .models import User, UserRole
@@ -10,11 +11,30 @@ import os
 import re
 import bcrypt
 
-SECRET_KEY = os.getenv("SECRET_KEY", "brightloop-secret-key-change-in-prod-2026")
+_secret = os.getenv("SECRET_KEY")
+if not _secret:
+    # Dev fallback only — set SECRET_KEY in production
+    _secret = "dev-only-brightloop-change-me"
+    import warnings
+    warnings.warn(
+        "SECRET_KEY is not set. Using insecure dev fallback. "
+        "Set the SECRET_KEY environment variable before production use.",
+        RuntimeWarning,
+        stacklevel=1,
+    )
+SECRET_KEY = _secret
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 12
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+
+EMAIL_RE = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+
+
+def validate_email(email: str) -> tuple[bool, str]:
+    if not email or not EMAIL_RE.match(email.strip()):
+        return False, "Invalid email address"
+    return True, ""
 
 
 def verify_password(plain: str, hashed: str) -> bool:
@@ -42,7 +62,7 @@ def validate_password(password: str) -> tuple[bool, str]:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -82,8 +102,15 @@ async def get_current_user(
     return user
 
 
-async def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
+async def require_user(request: Request, user: Optional[User] = Depends(get_current_user)) -> User:
     if user is None:
+        # Prefer redirect for browser navigations
+        accept = request.headers.get("accept", "")
+        if "text/html" in accept:
+            raise HTTPException(
+                status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+                headers={"Location": "/login"},
+            )
         raise HTTPException(status_code=401, detail="Authentication required")
     return user
 

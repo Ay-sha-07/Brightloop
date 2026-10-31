@@ -6,7 +6,10 @@
     <h1 class="mono">{{ inv.number }}</h1>
     <p>{{ inv.customer.full_name }} · Subscription <a href="/subscriptions/{{ inv.subscription_id }}">#{{ inv.subscription_id }}</a></p>
   </div>
-  <span class="badge badge-{{ inv.status.value }}" style="font-size:0.9rem;padding:0.4rem 0.8rem;">{{ inv.status.value }}</span>
+  <div class="btn-group">
+    <a href="/invoices/{{ inv.id }}/print" class="btn btn-sm" target="_blank">Print</a>
+    <span class="badge badge-{{ inv.status.value }}" style="font-size:0.9rem;padding:0.4rem 0.8rem;">{{ inv.status.value }}</span>
+  </div>
 </div>
 
 <div class="panel">
