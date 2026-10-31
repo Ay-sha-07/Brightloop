@@ -1,13 +1,11 @@
-﻿__pycache__/
+__pycache__/
 *.py[cod]
-*.pyc
 .env
 .venv/
 venv/
-data/*.db
+data/
 *.db
 .DS_Store
-Thumbs.db
 .idea/
 .vscode/
 *.log
